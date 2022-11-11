@@ -19,7 +19,7 @@ let validator = {
     set: function (target, key, value) {
         if (key === 'log') {
             log('console.log override blocked');
-            rerturn;
+            return;
         }
         target[key] = value;
     }
