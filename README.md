@@ -23,6 +23,8 @@ usage:
 - Windows / Typora 1.4.8          PASSED
 - Ubuntu / Typora 1.4.7             PASSED
 
+Since macos may adopt different packaging methods and webkit as the execution environment, this tool does not support applications under macos.
+
 ### Examples
 
 https://github.com/DiamondHunters/NodeInject_Hook_example
