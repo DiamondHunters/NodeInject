@@ -1,5 +1,5 @@
 [package]
-name = "typora_inject"
+name = "node_inject"
 version = "0.1.0"
 edition = "2021"
 

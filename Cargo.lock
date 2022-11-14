@@ -95,6 +95,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc7fcc620a3bff7cdd7a365be3376c97191aeaccc2a603e600951e452615bf89"
 
 [[package]]
+name = "node_inject"
+version = "0.1.0"
+dependencies = [
+ "random-string",
+ "rasar",
+]
+
+[[package]]
 name = "random-string"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -149,14 +157,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
-]
-
-[[package]]
-name = "typora_inject"
-version = "0.1.0"
-dependencies = [
- "random-string",
- "rasar",
 ]
 
 [[package]]
