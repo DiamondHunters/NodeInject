@@ -1,18 +1,23 @@
 use std::convert::AsRef;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
-use random_string::generate;
 
 
-const BYTES: &[u8] = include_bytes!("hooklog.js");
-const LICENSE_CHARS: &str = "L23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+const HOOK_JS_WRITE_PATH: &str = "./node/raven/hook.js"; //path to hook.js in unpacked module, if you change it, change it in append_require_to_file too
+#[cfg(feature = "no_embed")]
+const NO_EMBED_HOOK_JS_PATH: &str = "./hook.js"; // if no_emded feature is enabled, this file will be used in runtime
+#[cfg(not(feature = "no_embed"))]
+const EMBED_HOOK_JS_BYTES: &[u8] = include_bytes!("hooklog.js");   // embedded hooking code file,will be embedded in binary file
+const INJECT_JS_PATH: &str = "./node/raven/index.js"; //path for unpacked module to inject code into,if you want inject code into another module, change it here and in HOOK_JS_WRITE_PATH
+
+
 fn main() {
-    generate_license();
     if file_exist("./node"){
-        println!("You may have already installed the hook.");
+        println!("You may have already installed the hook.Please check manually.");
         return;
     }
     if !file_exist("./resources/node_modules.asar") {
+        println!("no node_modules.asar found");
         println!("move me to the root of your typora installation(the same directory as executable of electron)");
         return;
     }
@@ -30,29 +35,23 @@ fn file_exist(archive: &str) -> bool {
     return std::path::Path::new(archive).exists()
 }
 
+
+#[cfg(not(feature = "no_embed"))]
 fn write_js_to_file() {
-    let mut file = File::create("./node/raven/hook.js").unwrap();
-    file.write_all(BYTES).unwrap();
+    let mut file = File::create(HOOK_JS_WRITE_PATH).unwrap();
+    file.write_all(EMBED_HOOK_JS_BYTES).unwrap();
 }
+#[cfg(feature = "no_embed")]
+fn write_js_to_file() {
+    let mut file = File::create(HOOK_JS_WRITE_PATH).unwrap();
+    let mut hook_js = File::open(NO_EMBED_HOOK_JS_PATH).unwrap();
+    std::io::copy(&mut hook_js, &mut file).unwrap();
+}
+
 fn append_require_to_file() {
     let mut file = OpenOptions::new()
         .append(true)
-        .open("./node/raven/index.js")
+        .open(INJECT_JS_PATH)
         .unwrap();
     file.write_all("\nrequire('./hook')".as_ref()).unwrap();
-}
-fn generate_license(){
-    let mut license = generate(22, LICENSE_CHARS);
-    for n in  0..2 {
-        let mut o = 0;
-        for i in (0..16).step_by(2) {
-            o += LICENSE_CHARS.find(&license[n+i..=n+i]).unwrap()
-        }
-        o %= LICENSE_CHARS.len();
-        license += &LICENSE_CHARS[o..=o];
-    }
-    license.insert(6, '-');
-    license.insert(13, '-');
-    license.insert(20, '-');
-    println!("License for you: {}", license);
 }
